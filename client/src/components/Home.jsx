@@ -25,7 +25,7 @@ export default function Home() {
     }
     try {
       setLoading(true);
-      const res = await axios.post("http://localhost:5000/api/generate", {
+      const res = await axios.post("http://localhost:5000/api/questions/generate", {
         title,
         description,
         difficulty,
@@ -49,7 +49,7 @@ export default function Home() {
     if (!acceptedIds.includes(questionIndex)) {
       setAcceptedIds([...acceptedIds, questionIndex]);
       setQuizQuestions([...quizQuestions, question]);
-      console.log("Question accepted:", question);
+      // console.log("Question accepted:", question);
     }
   };
 
@@ -59,7 +59,56 @@ export default function Home() {
     
     setQuizQuestions(updatedQuizQuestions);
     setAcceptedIds(acceptedIds.filter(id => id !== questionIndex));
-    console.log("Question rejected:", question);
+    // console.log("Question rejected:", question);
+  };
+
+  const handleReorderQuestions = (newQuestions) => {
+    setQuizQuestions(newQuestions);
+  };
+
+  const handleSaveQuiz = async () => {
+    if (!roomName.trim()) {
+      alert("Please enter a room name for the quiz.");
+      return;
+    }
+
+    if (quizQuestions.length === 0) {
+      alert("Please select at least one question for the quiz.");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const response = await axios.post("http://localhost:5000/api/quiz/save", {
+        roomName: roomName.trim(),
+        title,
+        description,
+        difficulty,
+        questions: quizQuestions
+      });
+
+      if (response.data.success) {
+        alert(`✅ Quiz "${roomName}" saved successfully!\nQuiz ID: ${response.data.quizId}\nTotal Questions: ${response.data.totalQuestions}`);
+        
+        // Reset form for new quiz
+        setRoomName("");
+        setTitle("");
+        setDescription("");
+        setDifficulty([]);
+        setGeneratedQuestions([]);
+        setQuizQuestions([]);
+        setAcceptedIds([]);
+      }
+    } catch (error) {
+      console.error("Failed to save quiz:", error);
+      if (error.response?.data?.error) {
+        alert(`❌ Error: ${error.response.data.error}`);
+      } else {
+        alert("Failed to save quiz. Please try again.");
+      }
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -152,6 +201,9 @@ export default function Home() {
         <div className="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
           <QuizQueue 
             questions={quizQuestions}
+            onReorderQuestions={setQuizQuestions}
+            onSaveQuiz={() => alert("Quiz saved! (Functionality not implemented)")}
+            saving={false}
             onRejectQuestion={handleRejectQuestion}
           />
         </div>
