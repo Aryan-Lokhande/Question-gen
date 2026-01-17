@@ -80,7 +80,7 @@ No explanation.`;
 
     const geminires = await main(prompt);
     const questions = cleanGeminiResponse(geminires);
-    console.log("Generated Questions:", questions);
+    // console.log("Generated Questions:", questions);
     res.json({ success: true, questions });
   } catch (error) {
     res.json({ success: false, message: error.message });
