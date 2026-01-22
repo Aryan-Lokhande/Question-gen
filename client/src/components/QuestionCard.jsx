@@ -1,117 +1,114 @@
-import React, { useState } from 'react';
+// client/src/components/QuestionCard.jsx
+import { useState } from 'react';
 
-const QuestionCard = ({ question, index, onAccept, onReject, isAccepted }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+const QuestionCard = ({ question, onToggle, isSelected, showOrder = false, order }) => {
+  const [showDetails, setShowDetails] = useState(false);
 
   const getDifficultyColor = (difficulty) => {
-    switch(difficulty) {
-      case 'Easy': return 'bg-green-100 text-green-700 border-green-300';
-      case 'Medium': return 'bg-yellow-100 text-yellow-700 border-yellow-300';
-      case 'Hard': return 'bg-red-100 text-red-700 border-red-300';
-      default: return 'bg-gray-100 text-gray-700 border-gray-300';
+    switch (difficulty?.toLowerCase()) {
+      case 'easy':
+        return 'bg-green-100 text-green-800';
+      case 'medium':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'hard':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
+  const getTypeColor = (type) => {
+    return type === 'MCQ' 
+      ? 'bg-blue-100 text-blue-800' 
+      : 'bg-purple-100 text-purple-800';
+  };
+
   const truncateText = (text, maxLength = 60) => {
-    if (text.length <= maxLength) return text;
-    return text.substring(0, maxLength) + '...';
+    if (!text) return '';
+    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
   };
 
   return (
-    <div 
-      className={`border rounded-lg p-3 transition-all duration-200 ${
-        isExpanded ? 'shadow-lg scale-[1.02]' : 'shadow-sm hover:shadow-md'
-      } ${isAccepted ? 'border-blue-300 bg-blue-50' : 'border-gray-200 bg-white'}`}
-      onMouseEnter={() => setIsExpanded(true)}
-      onMouseLeave={() => setIsExpanded(false)}
+    <div
+      className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition relative"
+      onMouseEnter={() => setShowDetails(true)}
+      onMouseLeave={() => setShowDetails(false)}
     >
-      {/* Compact Header */}
-      <div className="flex items-start justify-between gap-2 mb-2">
-        <div className="flex items-center gap-2 flex-1 min-w-0">
-          <span className="text-xs font-bold text-blue-600 bg-blue-100 px-2 py-1 rounded shrink-0">
-            Q{index + 1}
-          </span>
-          <span className={`text-xs font-medium px-2 py-1 rounded border shrink-0 ${getDifficultyColor(question.difficulty)}`}>
+      {/* Order Number (for Quiz Queue) */}
+      {showOrder && (
+        <div className="absolute -top-2 -left-2 bg-blue-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">
+          {order}
+        </div>
+      )}
+
+      {/* Header with badges */}
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex gap-2">
+          <span className={`px-2 py-1 rounded text-xs font-medium ${getDifficultyColor(question.difficulty)}`}>
             {question.difficulty}
           </span>
-          <span className="text-xs font-medium bg-purple-100 text-purple-700 px-2 py-1 rounded shrink-0">
+          <span className={`px-2 py-1 rounded text-xs font-medium ${getTypeColor(question.type)}`}>
             {question.type}
           </span>
         </div>
-        
-        {/* Accept/Reject Button */}
+
+        {/* Toggle Icon */}
         <button
-          onClick={(e) => {
-            e.stopPropagation();
-            isAccepted ? onReject(question) : onAccept(question);
-          }}
-          className={`shrink-0 p-1.5 rounded transition-colors ${
-            isAccepted 
-              ? 'bg-red-500 hover:bg-red-600 text-white' 
-              : 'bg-green-500 hover:bg-green-600 text-white'
+          onClick={onToggle}
+          className={`p-1 rounded-full transition ${
+            isSelected
+              ? 'bg-red-100 text-red-600 hover:bg-red-200'
+              : 'bg-green-100 text-green-600 hover:bg-green-200'
           }`}
-          title={isAccepted ? 'Remove from quiz' : 'Add to quiz'}
+          title={isSelected ? 'Remove from queue' : 'Add to queue'}
         >
-          {isAccepted ? (
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          {isSelected ? (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           ) : (
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
           )}
         </button>
       </div>
 
-      {/* Question Preview/Full */}
-      <p className={`text-sm font-medium text-gray-800 mb-2 ${isExpanded ? '' : 'line-clamp-2'}`}>
-        {isExpanded ? question.question : truncateText(question.question)}
+      {/* Question Text */}
+      <p className="text-gray-800 text-sm font-medium">
+        {truncateText(question.question)}
       </p>
 
-      {/* Expanded Details */}
-      {isExpanded && (
-        <div className="mt-3 pt-3 border-t border-gray-200 animate-fadeIn">
-          {/* MCQ Options */}
+      {/* Hover Details */}
+      {showDetails && (
+        <div className="absolute z-10 top-full left-0 right-0 mt-2 bg-white border-2 border-blue-300 rounded-lg p-4 shadow-lg max-w-md">
+          <p className="text-gray-800 font-medium mb-2">{question.question}</p>
+          
           {question.type === 'MCQ' && question.options && (
-            <div className="space-y-1.5">
-              {question.options.map((option, optIndex) => (
-                <div 
-                  key={optIndex}
-                  className={`text-xs p-2 rounded flex items-center ${
-                    option === question.correctAnswer 
-                      ? 'bg-green-100 border border-green-300 text-green-800 font-medium' 
-                      : 'bg-gray-50 text-gray-700'
+            <div className="space-y-1">
+              <p className="text-xs text-gray-500 font-semibold mb-1">Options:</p>
+              {question.options.map((option, idx) => (
+                <div
+                  key={idx}
+                  className={`text-sm px-2 py-1 rounded ${
+                    option === question.correctAnswer
+                      ? 'bg-green-50 text-green-700 font-medium'
+                      : 'text-gray-600'
                   }`}
                 >
-                  <span className="font-semibold mr-2 shrink-0">
-                    {String.fromCharCode(65 + optIndex)}.
-                  </span>
-                  <span className="flex-1">{option}</span>
-                  {option === question.correctAnswer && (
-                    <svg className="w-4 h-4 text-green-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  )}
+                  {String.fromCharCode(65 + idx)}. {option}
                 </div>
               ))}
             </div>
           )}
 
-          {/* TRUE/FALSE Answer */}
-          {(question.type == 'True/False' || question.type == 'TRUE/FALSE') && (
-            <div className="p-2 bg-green-100 border border-green-300 rounded">
-              <span className="text-xs font-semibold text-green-800">
-                ✓ {question.correctAnswer}
-              </span>
-            </div>
+          {question.type === 'TRUE/FALSE' && (
+            <p className="text-sm text-gray-600">
+              <span className="font-semibold">Answer:</span>{' '}
+              <span className="text-green-700">{question.correctAnswer}</span>
+            </p>
           )}
         </div>
-      )}
-
-      {/* Expand Indicator */}
-      {!isExpanded && question.question.length > 60 && (
-        <p className="text-xs text-gray-400 italic mt-1">Hover to expand...</p>
       )}
     </div>
   );

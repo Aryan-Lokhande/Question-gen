@@ -2,8 +2,11 @@ import dotenv from 'dotenv';
 import express from 'express';
 import cors from 'cors';
 import connectDB from './config/database.js';
-import questionRoutes from './routes/questionRoutes.js';
-import quizRoutes from './routes/quizRoutes.js';
+// Import routes
+import authRoutes from './routes/authRoute.js';
+import questionRoutes from './routes/questionRoute.js';
+import roomRoutes from './routes/roomRoute.js';
+import savedRoomRoutes from './routes/savedRoom.js';
 
 dotenv.config();
 
@@ -18,8 +21,10 @@ app.use(express.json());
 connectDB();
 
 // Routes
+app.use('/api/auth', authRoutes);
 app.use('/api/questions', questionRoutes);
-app.use('/api/quiz', quizRoutes);
+app.use('/api/rooms', roomRoutes);
+app.use('/api/saved-rooms', savedRoomRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

@@ -1,5 +1,5 @@
 import main from '../service/gemini.js';
-import { cleanGeminiResponse, formatQuestionsResponse } from '../utils/helper.js';
+import { cleanGeminiResponse } from '../utils/helper.js';
 
 export const generateQuestions = async (req, res) => {
   try {
@@ -50,13 +50,11 @@ Example format:
 
     // Call Gemini API
     const rawResponse = await main(prompt);
+    // console.log('Raw Gemini Response:', rawResponse);
     
     // Clean and parse response
     const questions = cleanGeminiResponse(rawResponse);
-    
-    // Format and send response
-    // const response = formatQuestionsResponse(questions);
-    
+        
     console.log(`✅ Generated ${questions.length} questions for topic: ${title}`);
     
     res.json({success: true, questions});

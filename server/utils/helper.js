@@ -42,11 +42,3 @@ export function cleanGeminiResponse(rawResponse) {
     throw new Error(`Failed to parse Gemini response: ${error.message}`);
   }
 }
-
-export function formatQuestionsResponse(questions) {
-  return {
-    success: true,
-    count: questions.length,
-    questions: questions
-  };
-}

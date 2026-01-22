@@ -1,16 +1,18 @@
 import { useState } from "react";
 import axios from "axios";
-import QuestionQueue from "./QuestionQueue";
-import QuizQueue from "./QuizQueue";
+import QuestionQueue from "../components/QuestionQueue";
+import QuizQueue from "../components/QuizQueue";
 
-export default function Home() {
+export default function QuestionGen() {
   const [generatedQuestions, setGeneratedQuestions] = useState([]);
   const [quizQuestions, setQuizQuestions] = useState([]);
   const [acceptedIds, setAcceptedIds] = useState([]);
+  const [roomName, setRoomName] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [difficulty, setDifficulty] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const toggleDifficulty = (level) => {
     setDifficulty((prev) =>
@@ -31,7 +33,6 @@ export default function Home() {
         difficulty,
       });
       setGeneratedQuestions(res.data.questions);
-      // Reset quiz queue when new questions are generated
       setQuizQuestions([]);
       setAcceptedIds([]);
       console.log("Generated questions:", res.data);
@@ -49,7 +50,6 @@ export default function Home() {
     if (!acceptedIds.includes(questionIndex)) {
       setAcceptedIds([...acceptedIds, questionIndex]);
       setQuizQuestions([...quizQuestions, question]);
-      // console.log("Question accepted:", question);
     }
   };
 
@@ -59,7 +59,6 @@ export default function Home() {
     
     setQuizQuestions(updatedQuizQuestions);
     setAcceptedIds(acceptedIds.filter(id => id !== questionIndex));
-    // console.log("Question rejected:", question);
   };
 
   const handleReorderQuestions = (newQuestions) => {
@@ -79,6 +78,7 @@ export default function Home() {
 
     setSaving(true);
     try {
+      console.log("before save quiz",quizQuestions)
       const response = await axios.post("http://localhost:5000/api/quiz/save", {
         roomName: roomName.trim(),
         title,
@@ -127,6 +127,19 @@ export default function Home() {
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-2">
+                Room Name *
+              </label>
+              <input
+                className="w-full p-3 rounded-lg text-white bg-gray-700 border border-gray-600 focus:border-purple-500 focus:outline-none transition"
+                placeholder="e.g., Room1, JavaScript-Quiz"
+                value={roomName}
+                onChange={(e) => setRoomName(e.target.value)}
+              />
+              <p className="text-xs text-gray-400 mt-1">Unique identifier for this quiz</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">
                 Title / Topic *
               </label>
               <input
@@ -143,8 +156,8 @@ export default function Home() {
               </label>
               <textarea
                 className="w-full p-3 rounded-lg text-white bg-gray-700 border border-gray-600 focus:border-purple-500 focus:outline-none transition resize-none"
-                placeholder="Add additional context or requirements..."
-                rows={4}
+                placeholder="Add additional context..."
+                rows={3}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
               />
@@ -174,7 +187,11 @@ export default function Home() {
 
             {loading && (
               <div className="flex items-center justify-center p-3 bg-yellow-900/30 border border-yellow-600 rounded-lg">
-                <span className="text-yellow-400 text-sm">Generating questions...</span>
+                <svg className="animate-spin h-5 w-5 mr-2 text-yellow-400" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span className="text-yellow-400 text-sm">Generating...</span>
               </div>
             )}
 
@@ -188,7 +205,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* CENTER - Generated Questions Queue */}
+        {/* CENTER - Generated Questions */}
         <div className="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
           <QuestionQueue 
             questions={generatedQuestions}
@@ -197,32 +214,16 @@ export default function Home() {
           />
         </div>
 
-        {/* RIGHT - Quiz Queue (Accepted Questions) */}
+        {/* RIGHT - Quiz Queue */}
         <div className="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
           <QuizQueue 
             questions={quizQuestions}
-            onReorderQuestions={setQuizQuestions}
-            onSaveQuiz={() => alert("Quiz saved! (Functionality not implemented)")}
-            saving={false}
             onRejectQuestion={handleRejectQuestion}
+            onReorderQuestions={handleReorderQuestions}
+            onSaveQuiz={handleSaveQuiz}
+            saving={saving}
           />
         </div>
-      </div>
-
-      {/* Bottom Action Button */}
-      <div className="text-center">
-        <button 
-          disabled={quizQuestions.length === 0}
-          className={`px-8 py-3 rounded-lg font-medium transition-all ${
-            quizQuestions.length > 0
-              ? 'bg-green-600 hover:bg-green-700 cursor-pointer'
-              : 'bg-gray-700 cursor-not-allowed opacity-50'
-          }`}
-        >
-          {quizQuestions.length > 0 
-            ? `Start Quiz (${quizQuestions.length} questions)` 
-            : 'Start Quiz (No questions selected)'}
-        </button>
       </div>
     </div>
   );

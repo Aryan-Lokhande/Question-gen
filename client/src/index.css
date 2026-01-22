@@ -1,2 +1,16 @@
 @import "tailwindcss";
 
+@layer base {
+  :root {
+    --bg-primary: #dfddec;
+    --bg-sec: #edecf2;
+    --bg-ter: #ffffff;
+    --txt: #1f2937;
+    --txt-dim: #525f70;
+    --txt-disabled: #888888;
+    --radius: 0.5rem;
+    --btn: #7f23ca;
+    --btn-hover: #8f30de;
+    --shadow-rgb: 127, 35, 202; /* Default shadow RGB */
+  }
+}
