@@ -2,11 +2,13 @@ import dotenv from 'dotenv';
 import express from 'express';
 import cors from 'cors';
 import connectDB from './config/database.js';
+// import { startCronJobs } from './utils/cronJobs.js';
 // Import routes
 import authRoutes from './routes/authRoute.js';
 import questionRoutes from './routes/questionRoute.js';
 import roomRoutes from './routes/roomRoute.js';
 import savedRoomRoutes from './routes/savedRoom.js';
+import quizRoutes from './routes/quizRoute.js';
 
 dotenv.config();
 
@@ -25,6 +27,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/questions', questionRoutes);
 app.use('/api/rooms', roomRoutes);
 app.use('/api/saved-rooms', savedRoomRoutes);
+app.use('/api/quiz', quizRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -54,4 +57,6 @@ app.use((err, req, res, next) => {
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
+  // Start cron jobs
+  // startCronJobs();
 });

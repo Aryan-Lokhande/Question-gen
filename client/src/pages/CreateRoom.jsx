@@ -5,6 +5,7 @@ import axios from "axios";
 import QuestionForm from "../components/QuestionForm";
 import QuestionCard from "../components/QuestionCard";
 import QuizQueue from "../components/QuizQueue";
+import { PlusCircle, ListChecks, CheckCircle2 } from "lucide-react";
 
 const CreateRoom = () => {
   const { roomId } = useParams();
@@ -109,151 +110,122 @@ const CreateRoom = () => {
 
   if (!roomData) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-[var(--bg-primary)]">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[var(--btn)]"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--txt)]">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-800">
-                {roomData.roomName}
-              </h1>
-              <div className="flex gap-3 mt-1">
-                <span className="text-sm text-gray-500">
-                  ID:{" "}
-                  <span className="font-mono font-semibold">
-                    {roomData.roomId}
-                  </span>
-                </span>
-                <span className="text-sm text-gray-500">•</span>
-                <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-sm rounded">
-                  {roomData.category}
-                </span>
-              </div>
+      <header className="sticky top-0 z-10 bg-[var(--bg-ter)] border-b border-black/5">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          {/* Left: Room Info */}
+          <div>
+            <h1 className="text-xl font-semibold text-[var(--txt)]">
+              {roomData.roomName}
+            </h1>
+            <div className="flex items-center gap-3 mt-1 text-sm text-[var(--txt-dim)]">
+              <span className="font-mono">ID: {roomData.roomId}</span>
+              <span className="w-1 h-1 bg-[var(--txt-dim)] rounded-full" />
+              <span className="px-2 py-0.5 rounded bg-[var(--bg-sec)]">
+                {roomData.category}
+              </span>
             </div>
-            <button
-              onClick={handleCreateRoom}
-              disabled={selectedQuestions.length < 5 || isCreating}
-              className="px-6 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2"
-            >
-              {isCreating ? (
-                <>
-                  <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                      fill="none"
-                    />
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    />
-                  </svg>
-                  Creating...
-                </>
-              ) : (
-                <>
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                  Create Room
-                </>
-              )}
-            </button>
           </div>
+
+          {/* Right: Create Room Action */}
+          <button
+            onClick={handleCreateRoom}
+            disabled={selectedQuestions.length < 5 || isCreating}
+            className="flex items-center gap-2 px-5 py-2 rounded-md
+                 bg-[var(--btn)] text-white text-sm font-medium
+                 hover:bg-[var(--btn-hover)] transition
+                 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <CheckCircle2 size={16} />
+            {isCreating ? "Creating..." : "Create Room"}
+          </button>
         </div>
-      </div>
+      </header>
 
-      {/* Main Content - 3 Columns */}
-      <div className="max-w-7xl mx-auto px-6 py-6">
-        <div className="grid grid-cols-12 gap-6">
-          {/* Column 1: Form */}
-          <div className="col-span-3">
-            <QuestionForm
-              onQuestionsGenerated={handleQuestionsGenerated}
-              isLoading={isLoading}
-              setIsLoading={setIsLoading}
-            />
-          </div>
+      {/* Main Workflow */}
+      <main className="p-6 overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full ">
+          {/* Step 1 */}
+          <section
+            className="lg:col-span-3 h-full bg-[var(--bg-ter)]
+                        rounded-lg border border-black/5 p-4
+                        flex flex-col overflow-hidden"
+          >
+            <div className="flex items-center gap-2 mb-4 text-sm font-semibold shrink-0">
+              <PlusCircle size={18} />
+              Generate Questions
+            </div>
 
-          {/* Column 2: Generated Questions */}
-          <div className="col-span-5">
-            <div className="bg-white rounded-lg border border-gray-200 p-6">
-              <h3 className="text-lg font-bold text-gray-800 mb-4">
-                Question Queue ({generatedQuestions.length})
-              </h3>
+            <div className="flex-1 overflow-y-auto hide-scrollbar">
+              <QuestionForm
+                onQuestionsGenerated={handleQuestionsGenerated}
+                isLoading={isLoading}
+                setIsLoading={setIsLoading}
+              />
+            </div>
+          </section>
 
+          {/* Step 2 */}
+          <section
+            className="lg:col-span-5 h-full bg-[var(--bg-ter)] rounded-lg border border-black/5 p-4
+                        flex flex-col overflow-hidden"
+          >
+            <div className="flex items-center justify-between mb-4 shrink-0">
+              <div className="flex items-center gap-2 font-semibold text-sm">
+                <ListChecks size={18} />
+                Question Pool
+              </div>
+              <span className="text-xs text-[var(--txt-dim)]">
+                {generatedQuestions.length} questions
+              </span>
+            </div>
+
+            <div className="flex-1 overflow-y-auto hide-scrollbar pr-1">
               {generatedQuestions.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-12 text-center">
-                  <svg
-                    className="w-16 h-16 text-gray-300 mb-3"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                  <p className="text-gray-500 text-sm">
-                    No questions generated yet
-                  </p>
-                  <p className="text-gray-400 text-xs mt-1">
-                    Use the form to generate questions
-                  </p>
+                <div
+                  className="h-full flex flex-col items-center justify-center
+                          text-center text-[var(--txt-dim)]"
+                >
+                  <p className="text-sm">No questions generated</p>
+                  <p className="text-xs mt-1">Use the left panel to start</p>
                 </div>
               ) : (
-                <div className="space-y-3 overflow-y-auto max-h-[calc(100vh-280px)]">
-                  {generatedQuestions.map((question) => (
+                <div className="space-y-3">
+                  {generatedQuestions.map((q) => (
                     <QuestionCard
-                      key={question.id}
-                      question={question}
-                      onToggle={() => handleToggleQuestion(question)}
-                      isSelected={selectedQuestions.some(
-                        (q) => q.id === question.id,
-                      )}
+                      key={q.id}
+                      question={q}
+                      onToggle={() => handleToggleQuestion(q)}
+                      isSelected={selectedQuestions.some((s) => s.id === q.id)}
                     />
                   ))}
                 </div>
               )}
             </div>
-          </div>
+          </section>
 
-          {/* Column 3: Quiz Queue (Draggable) */}
-          <div className="col-span-4">
+          {/* Step 3 */}
+          <section
+            className="lg:col-span-4 h-full bg-[var(--bg-ter)]
+                        rounded-lg border border-black/5
+                        flex flex-col overflow-hidden"
+          >
             <QuizQueue
               selectedQuestions={selectedQuestions}
               setSelectedQuestions={setSelectedQuestions}
               roomId={roomId}
             />
-          </div>
+          </section>
         </div>
-      </div>
+      </main>
     </div>
   );
 };

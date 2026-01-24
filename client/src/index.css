@@ -11,6 +11,29 @@
     --radius: 0.5rem;
     --btn: #7f23ca;
     --btn-hover: #8f30de;
-    --shadow-rgb: 127, 35, 202; /* Default shadow RGB */
+    --shadow-rgb: 127, 35, 202; 
+  } 
+ 
+  :root {
+    --bg-primary: #111827;
+    --bg-sec: #1f2937;
+    --bg-ter: #374151;
+    --txt: #d1d5db;
+    --txt-dim: #9ca3af;
+    --txt-disabled: #9097a2;
+    --radius: 0.5rem;
+    --btn: #6b21a8;
+    --btn-hover: #7a24c1;
+    --logo-invert: 1;
+    --shadow-rgb: 107, 33, 168;
   }
+}
+
+.hide-scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }

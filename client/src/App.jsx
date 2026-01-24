@@ -15,6 +15,8 @@ import { AuthProvider } from "./context/AuthContext";
 // Import new pages
 import Session from "./pages/Session";
 import CreateRoom from "./pages/CreateRoom";
+import Quiz from "./pages/Quiz";
+import FinalLeaderboard from "./pages/FinalLeaderboard";
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -52,6 +54,22 @@ function App() {
             element={
               <ProtectedRoute>
                 <CreateRoom />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/final-leaderboard/:roomId"
+            element={
+              <ProtectedRoute>
+                <FinalLeaderboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/quiz/:roomId"
+            element={
+              <ProtectedRoute>
+                <Quiz />
               </ProtectedRoute>
             }
           />

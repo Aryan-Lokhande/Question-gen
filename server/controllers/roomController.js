@@ -26,7 +26,7 @@ export const createRoom = async (req, res) => {
     }
 
     // Generate unique 5-character room ID
-    const roomId = nanoid(5);
+    const roomId = nanoid(5).toUpperCase();
 
     // Create room
     const room = await Room.create({

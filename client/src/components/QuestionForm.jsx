@@ -1,22 +1,23 @@
 // client/src/components/QuestionForm.jsx
-import { useState } from 'react';
-import axios from 'axios';
+import { useState } from "react";
+import axios from "axios";
+import { Sparkles, SlidersHorizontal } from "lucide-react";
 
 const QuestionForm = ({ onQuestionsGenerated, isLoading, setIsLoading }) => {
   const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    difficulty: []
+    title: "",
+    description: "",
+    difficulty: [],
   });
 
-  const difficulties = ['Easy', 'Medium', 'Hard'];
+  const difficulties = ["Easy", "Medium", "Hard"];
 
   const handleDifficultyToggle = (level) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       difficulty: prev.difficulty.includes(level)
-        ? prev.difficulty.filter(d => d !== level)
-        : [...prev.difficulty, level]
+        ? prev.difficulty.filter((d) => d !== level)
+        : [...prev.difficulty, level],
     }));
   };
 
@@ -24,7 +25,7 @@ const QuestionForm = ({ onQuestionsGenerated, isLoading, setIsLoading }) => {
     e.preventDefault();
 
     if (!formData.title || formData.difficulty.length === 0) {
-      alert('Please enter a title and select at least one difficulty level');
+      alert("Please enter a title and select at least one difficulty level");
       return;
     }
 
@@ -32,115 +33,137 @@ const QuestionForm = ({ onQuestionsGenerated, isLoading, setIsLoading }) => {
 
     try {
       console.log(formData);
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL}/api/questions/generate`,
         formData,
         {
           headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
+            Authorization: `Bearer ${token}`,
+          },
+        },
       );
 
       if (response.data.success) {
         onQuestionsGenerated(response.data.questions);
         // Reset form
         setFormData({
-          title: '',
-          description: '',
-          difficulty: []
+          title: "",
+          description: "",
+          difficulty: [],
         });
       } else {
-        alert(response.data.error || 'Failed to generate questions');
+        alert(response.data.error || "Failed to generate questions");
       }
     } catch (error) {
-      console.error('Error generating questions:', error);
-      alert(error.response?.data?.error || 'Failed to generate questions');
+      console.error("Error generating questions:", error);
+      alert(error.response?.data?.error || "Failed to generate questions");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-6 h-fit sticky top-4">
-      <h3 className="text-lg font-bold text-gray-800 mb-4">Generate Questions</h3>
+    <div className="bg-[var(--bg-ter)] rounded-lg border border-black/5 p-5 ">
+      {/* Header */}
+      <div className="flex items-start gap-2 mb-5 hide-scrollbar">
+        <Sparkles size={18} className="mt-1 text-[var(--btn)]" />
+        <div>
+          <h3 className="text-sm font-semibold text-[var(--txt)]">
+            Generate Questions
+          </h3>
+          <p className="text-xs text-[var(--txt-dim)]">
+            AI will create questions based on your input
+          </p>
+        </div>
+      </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Title */}
+        {/* Topic */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Topic/Title <span className="text-red-500">*</span>
+          <label className="block text-xs font-medium text-[var(--txt-dim)] mb-1">
+            Topic / Title <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
             value={formData.title}
-            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            placeholder="e.g., JavaScript Array Methods"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onChange={(e) =>
+              setFormData({ ...formData, title: e.target.value })
+            }
+            placeholder="e.g. JavaScript Array Methods"
             disabled={isLoading}
+            className="w-full px-3 py-2 rounded-md border border-black/10 bg-[var(--bg-sec)] text-sm
+                     focus:outline-none focus:ring-2 focus:ring-[var(--btn)]"
           />
         </div>
 
         {/* Description */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Description <span className="text-gray-400">(Optional)</span>
+          <label className="block text-xs font-medium text-[var(--txt-dim)] mb-1">
+            Description{" "}
+            <span className="text-[var(--txt-disabled)]">(optional)</span>
           </label>
           <textarea
+            rows={3}
             value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            placeholder="Additional context or specific topics..."
-            rows="3"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+            onChange={(e) =>
+              setFormData({ ...formData, description: e.target.value })
+            }
+            placeholder="Extra context, syllabus focus, etc."
             disabled={isLoading}
+            className="w-full px-3 py-2 rounded-md border border-black/10 bg-[var(--bg-sec)] text-sm resize-none
+                     focus:outline-none focus:ring-2 focus:ring-[var(--btn)]"
           />
         </div>
 
         {/* Difficulty */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Difficulty Levels <span className="text-red-500">*</span>
-          </label>
-          <div className="flex gap-2">
-            {difficulties.map((level) => (
-              <button
-                key={level}
-                type="button"
-                onClick={() => handleDifficultyToggle(level)}
-                disabled={isLoading}
-                className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition ${
-                  formData.difficulty.includes(level)
-                    ? level === 'Easy'
-                      ? 'bg-green-600 text-white'
-                      : level === 'Medium'
-                      ? 'bg-yellow-600 text-white'
-                      : 'bg-red-600 text-white'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
-              >
-                {level}
-              </button>
-            ))}
+          <div className="flex items-center gap-2 mb-2">
+            <SlidersHorizontal size={14} />
+            <span className="text-xs font-medium text-[var(--txt-dim)]">
+              Difficulty Level <span className="text-red-500">*</span>
+            </span>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2">
+            {difficulties.map((level) => {
+              const active = formData.difficulty.includes(level);
+              return (
+                <button
+                  key={level}
+                  type="button"
+                  disabled={isLoading}
+                  onClick={() => handleDifficultyToggle(level)}
+                  className={`px-2 py-2 rounded-md text-xs font-medium transition border
+                  ${
+                    active
+                      ? "bg-[var(--btn)] text-white border-[var(--btn)] "
+                      : "bg-[var(--bg-sec)] text-[var(--txt-dim)] border-black/10 hover:bg-[var(--bg-primary)]"
+                  }`}
+                >
+                  {level}
+                </button>
+              );
+            })}
           </div>
         </div>
 
-        {/* Generate Button */}
+        {/* Submit */}
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="w-full mt-2 px-4 py-2.5 rounded-md bg-[var(--btn)] text-white text-sm font-medium
+                   hover:bg-[var(--btn-hover)] transition
+                   disabled:opacity-60 disabled:cursor-not-allowed
+                   flex items-center justify-center gap-2"
         >
           {isLoading ? (
             <>
-              <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-              </svg>
+              <span className="animate-spin h-4 w-4 border-2 border-white/40 border-t-white rounded-full" />
               Generating...
             </>
           ) : (
-            'Generate Questions'
+            "Generate Questions"
           )}
         </button>
       </form>
